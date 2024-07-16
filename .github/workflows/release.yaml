@@ -5,7 +5,7 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
-      
+
 jobs:
   release:
     runs-on: ubuntu-22.04
@@ -30,8 +30,13 @@ jobs:
       - name: Get tag message
         id: get_tag_message
         run: |
-          TAG_MESSAGE=$(git for-each-ref --format='%(contents)' "refs/tags/${{ env.tag }}")
-          echo "tag_message=$TAG_MESSAGE" >> $GITHUB_ENV
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          echo "TAG_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})" >> $GITHUB_ENV   
+          echo "EOF" >> $GITHUB_ENV       
+
+      - name: Test
+        run: echo $TAG_MESSAGE
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -39,7 +44,7 @@ jobs:
         with:
           generate_release_notes: true
           append_body: true
-          body: ${{ env.tag_message }}
+          body: ${{ env.TAG_MESSAGE }}
           files: |
             docker/compose.yml
             ${{ runner.temp }}/env.sample
