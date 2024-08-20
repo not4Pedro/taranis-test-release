@@ -575,7 +575,7 @@ class Story(BaseModel):
                 story.news_items.remove(news_item)
                 news_item.delete_item()
             else:
-                logger.debug(f"User {user.id} not allowed to remove news item {news_item.id}")
+                logger.debug(f"User {user.id} not a llowed to remove news item {news_item.id}")
                 return {"error": f"User {user.id} not allowed to remove news item {news_item.id}"}, 403
 
         story.update_status()
